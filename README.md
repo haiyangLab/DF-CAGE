@@ -5,3 +5,8 @@ DF-CAGE is a novel machine learning-based method for cancer-druggable gene disco
 python oncoKB.py -m    
 # The predicted results of ~20,000 protein-coding region genes are stored in ./results/  
 ```
+The five-fold crossover performance of DF-CAGE on the oncokb dataset is used as follows
+```shell
+# Shown are the results under different ratios of positive and negative samples, taking positive and negative samples 1:1 as an example.
+python oncoKB.py -t 
+```
