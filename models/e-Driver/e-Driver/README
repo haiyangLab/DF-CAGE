@@ -1,0 +1,11 @@
+These results apply only to mutations tagged with "Missense_Mutation"
+
+The data used in this analysis are in:
+"CREATE GITHUB REPO"
+
+We recommend to take as positives those genes with q < 0.05
+
+The method is described in:
+Eduard Porta-Pardo, Adam Godzik
+e-Driver: a novel method to identify protein regions driving cancer.
+Bioinformatics 2014; 30 (21): 3109-3114. doi: 10.1093/bioinformatics/btu499
