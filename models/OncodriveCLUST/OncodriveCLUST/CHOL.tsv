@@ -1,0 +1,2 @@
+gene	transcript	protein_change	score	pvalue	qvalue	info
+IDH1	ENST00000415913	.	.	1.4601095077599999e-08	1.4601095077599999e-08	PROT_RANGE=132-132;CLUSTER_MUT_COUNT=5

@@ -1,0 +1,2 @@
+gene	transcript	protein_change	score	pvalue	qvalue	info
+TP53	ENST00000269305	.	.	0.8654107421989999	0.8654107421989999	PROT_RANGE=213-214;CLUSTER_MUT_COUNT=3
