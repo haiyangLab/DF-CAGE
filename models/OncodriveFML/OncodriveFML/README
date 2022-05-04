@@ -1,0 +1,17 @@
+OncodriveFML results:
+
+- The results have been calculated considering all the observed mutations in CDS regions.
+- Mutation data (PUBLIC MC3 MAF file v.0.2.8 ) were retrieved from syn7824274 and filtered according to these 
+  guidelines and scripts: https://www.dropbox.com/sh/w4r5w25ihgmliy3/AABS5ooiVW_ZsBgdin_tr0uaa?dl=0
+- CDS regions were extracted from Gencode release 19 (https://www.gencodegenes.org/releases/19.html). 
+  The annotations include all CDS where both the "gene_type" and the "transcript_type" were tagged as 
+  "protein_coding".
+- Recommended threshold: qvalue of 0.25 or 0.1, depending of the number of samples in the cohort. Only pvalues 
+  of genes mutated in at least two samples have been adjusted with BH. 
+- The INFO column contains the following attributes: SAMPLES, number of mutated samples; SNV, number of 
+  substitutions; INDEL, number of insertions and/or deletions; STRATIFIED_FDR, stratified BH adjusted pvalues, 
+  independent BH correction of CGC genes and not-CGC genes.
+- Method citation: OncodriveFML: a general framework to identify coding and non-coding regions with cancer 
+  driver mutations. Mularoni L, Sabarinathan R, Deu-Pons J, Gonzalez-Perez A, López-Bigas N.
+  Genome Biol. 2016 Jun 16;17(1):128. doi: 10.1186/s13059-016-0994-0.
+ 
