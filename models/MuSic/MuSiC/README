@@ -1,0 +1,25 @@
+MuSiC2 
+------
+MuSiC2 version 0.2 is a frequency based tool used to identify significantly mutated genes. The significance is determined by comparing a calculated background mutation frequency to a convolution for specific transition, transversion, and CpG variants. Default parameters for initial SMG identification. A recent update to MuSiC2 (https://github.com/ding-lab/MuSiC2) provides a long gene filter, which seeks to remove false positives by virtue of finding genes whose elevated mutation tallies are due primarily to their larger size rather than their mutational significance. Briefly, it systematically tightens the p-value threshold for longer genes (>5000nt) based on a table test of uncoupling gene status (significant versus not significant) from gene size (long gene versus typical-size gene).  
+
+Input
+-----
+Inputs to MuSiC include coverage wig files, mutations, and hg19 reference file.
+The analysis was performed on the public MC3 data file mc3.v0.2.8.PUBLIC.maf.gz (https://www.synapse.org/#!Synapse:syn7824274) following filtering recommendations for PASS only variants. With exceptions to OV and LAML.
+The cancer type column and filtering were performed using the suggested scripts (hypermutators were removed).
+After preliminary results were generated. We performed a post hoc long gene filter deter inclusion based on length as opposed to significance. This was done using MuSiC2's long-gene-filter command with default settings. 
+
+Results
+-------
+We recommend that you use "FILTER=PASS" calls from the info column that reflect filter genes after p-value cut-off of 1e-8 and long gene filter. 
+Results from the PANCAN.txt were particularly susceptible inflated statistics due to the increase mutations frequency of combining calls.
+
+
+Citation
+--------
+Dees, N.D., Zhang, Q., Kandoth, C., Wendl, M.C., Schierding, W., Koboldt, D.C., Mooney, T.B., Callaway, M.B., Dooling, D., and Mardis, E.R. (2012). MuSiC: identifying mutational significance in cancer genomes. Genome research 22, 1589-1598.
+
+Contact
+-------
+Please contact either Matt Bailey (matthew.bailey AT wustl DOT edu) or Qingsong Gao (qingsong.gao AT wustl DOT edu) and Li Ding (lding AT wustl DOT edu) for more information.
+
