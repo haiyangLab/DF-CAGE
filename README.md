@@ -21,3 +21,4 @@ The predicted results of ~20,000 protein-coding region genes:
 ```shell
 Python exp.py
 ```
+DF-CAGE is based on the Python program language. The deep learning network's implementation was based on Numpy 1.19.2, Scipy 1.4.1, Scikit-learn 0.24.1, Matplotlib 3.3.4, Pandas 1.2.4, joblib 1.1.0. After the testing, DF-CAGE can operate normally.
