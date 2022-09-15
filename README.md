@@ -23,4 +23,6 @@ The predicted results of ~20,000 protein-coding region genes:
 ```shell
 Python exp.py
 ```
+When dealing with missing values of features, we used the imputation method of the mean. In order to make better use of the other dimensions of data to impute the missing annotation, We used Monte Carlo simulation method to impute the original data into several complete data sets, use linear regression method to carry out imputation modeling in each data set, and then integrate these complete models together to evaluate the pros and cons of the imputation model and returns the full dataset. we used the mice package in R for all the variants in the testing datasets.
+
 DF-CAGE is based on the Python program language. The deep learning network's implementation was based on Numpy 1.19.2, Scipy 1.4.1, Scikit-learn 0.24.1, Matplotlib 3.3.4, Pandas 1.2.4, joblib 1.1.0. After the testing, DF-CAGE can operate normally.
