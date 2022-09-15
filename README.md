@@ -19,7 +19,7 @@ python drug_targets.py
 # Subsequently, the OncoKB dataset was used for training and the DrugBank collection was used for prediction, resulting in performance runs as follows.
 python drugbank.py
 ```
-The predicted results of ~20,000 protein-coding region genes:
+The prediction results for ~ 20,000 protein coding genes were run as follows:
 ```shell
 Python exp.py
 ```
