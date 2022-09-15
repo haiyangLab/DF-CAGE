@@ -1,7 +1,7 @@
 # DF-CAGE
 DF-CAGE is a novel machine learning-based method for cancer-druggable gene discovery. The input for the framework is copy number, mRNA, DNA methylation, and other omics data. The output is the classification score vector. DF-CAGE is mainly divided into two components: 1. The multi-granularity scan module is used to obtain latent variables from each type of omics data. 2. The cascaded forest module determines the classification score vector for each sample.
 
-Stored in the input directory is the input data of DF-CAGE from the three gene sets of Oncokb, Target, and Drugbank. The results of the 465 druggable genes predicted by the DF-CAGE model are stored in the results directory, and we divide the 465 genes into known, reliable, and potential gene sets, among which the known gene sets contain the druggable genes of OncoKB and Target.
+Stored in the input directory is the input data of DF-CAGE from the three gene sets of Oncokb, Target, and Drugbank. The results of the 465 druggable genes predicted by the DF-CAGE model are stored in the results directory, and we divide the 465 genes into known, reliable, and potential gene sets, among which the known gene sets contain the druggable genes of OncoKB and Target. We can run DF-CAGE in the following way.
 ```shell
 # The data in the Input folder is the extracted feature data, now cross-validated on the OncoKB dataset with the following command： 
 python oncoKB.py   
