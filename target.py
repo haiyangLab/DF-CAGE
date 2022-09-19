@@ -15,7 +15,7 @@ import os
 import random
 import torch
 import math
-#设置随机种子
+
 seed = 1
 torch.manual_seed(seed)
 random.seed(seed)
@@ -44,7 +44,7 @@ df = pd.read_csv(r'./results/oncokb_set.csv',sep=',')
 y = df['class'].values
 x = df.drop(['label','Hugo_Symbol','class'], axis = 1).values
 
-#找roc的最优阈值
+#Find the optimal threshold of roc
 def Find_Optimal_Cutoff(TPR, FPR, threshold):
     y = TPR - FPR
     Youden_index = np.argmax(y)  # Only the first occurrence is returned.
@@ -59,11 +59,11 @@ def fisher_ex(a, b, c, d):
     # p1 = -math.log10(pvalue)
     return ordio,pvalue
 
-#p存储模型的预测值，q存储标签
+#P stores the predicted value of the model, q stores the label
 p = []
 q = []
 
-#半监督的交叉验证
+#Cross-validation
 def fit_cv(X,y, k, b_plot=False, method='RF'):
     n = X.shape[0]
     assignments = np.array((n // k + 1) * list(range(1, k + 1)))
@@ -80,10 +80,6 @@ def fit_cv(X,y, k, b_plot=False, method='RF'):
         scaler = RobustScaler()
         X_train = scaler.fit_transform(X_train)
         X_test = scaler.transform(X_test)
-
-
-
-        # sys.exit()
 
         if method == 'SVM':
             model = SelfTrainingClassifier(SVC(gamma='auto', probability=True))
@@ -104,9 +100,7 @@ def fit_cv(X,y, k, b_plot=False, method='RF'):
             probas_ = model.predict_proba(X_test)[:, 1]
             fpr, tpr, thresholds = roc_curve(y_test, probas_)
             roc_auc_1 = auc(fpr, tpr)
-            print('准确率：{}'.format(roc_auc_1))
             optimal_th, optimal_point = Find_Optimal_Cutoff(TPR=tpr, FPR=fpr, threshold=thresholds)
-            print('门限：{}'.format(optimal_th))
             if roc_auc_1 > z:
                 z = roc_auc_1
                 m = optimal_th
@@ -138,7 +132,6 @@ def fit_cv(X,y, k, b_plot=False, method='RF'):
     print("Mean AUPRC (area = %0.4f)" % AP)
     return m
 
-#其他方法得auroc
 def gui(path,m):
     df = pd.read_csv(r'./models/{}/{}/PANCAN.txt'.format(path,path),sep='\t')
     if path == '2020plus':
@@ -158,9 +151,8 @@ def gui(path,m):
     df.to_csv(r'./models/{}/{}/PANCAN_1.csv'.format(path, path), index=False, sep=',')
 
 
-    #//////////////////////////////归一化
+    #Normalized
     df_guiyi = pd.read_csv(r'./models/{}/{}/PANCAN_1.csv'.format(path,path),sep=',')
-    #进行从大到小排序，然后把重复项去除，保留数值大的
     df_guiyi.sort_values(by='pvalue', ascending=False,inplace=True)
     df_guiyi = df_guiyi.drop_duplicates(subset=['gene'], keep='first')
     df_guiyi['pvalue']= df_guiyi[['pvalue']].apply(lambda x:(x-np.min(x))/(np.max(x)-np.min(x)))
@@ -193,20 +185,15 @@ def gui(path,m):
     AP = average_precision_score(list_y, list_x)
     print('AUPRC--{}:'.format(path), AP)
 
-    #富集分析
+    #Enrichment analysis
     df_new_num = df_new[df_new['class']==1]['Hugo_Symbol'].tolist()
     df_new1 = df_new[df_new['pvalue']>m]
     num_a = len(df_new1[df_new1['Hugo_Symbol'].isin(df_new_num)].index)
-    print('{}方法报告的可用药基因个数：{}'.format(path, num_a))
     num_b = len(df_new1.index)-num_a
     df_num2 = df_new[df_new['pvalue']<m]
     num_c = len(df_num2[df_num2['Hugo_Symbol'].isin(df_new_num)].index)
     num_d = len(df_new.index)-len(df_new1.index)-num_c
     o,p = fisher_ex(num_a,num_b,num_c,num_d)
-    print('{}富集p：{}'.format(path,p))
-    # odds ratio
-    print('{}富集odds ratio：{}'.format(path, o))
-
     #AP = average_precision_score(list_y, list_x)
     #plt.plot(recall, precision, label='{}(AP=%0.2f)'.format(path) % AP)
     plt.plot(fpr, tpr, label='{}(AUC=%0.4f)'.format(path) % roc_auc)
@@ -254,27 +241,18 @@ df1 = pd.concat([df,probas_df],axis=1)
 
 df1_true_num = df1[df1['class']==1]['Hugo_Symbol'].values.tolist()
 df2 = df1[df1['pvalues']>m]
-#print('DF-CAGE方法报告的可用药基因的个数：{}'.format(len(df2.index)))
 num_above_threshold_ture = len(df2[df2['Hugo_Symbol'].isin(df1_true_num)].index)##29(1:1)
-print('DF-CAGE方法报告的可用药基因的个数：{}'.format(num_above_threshold_ture))
 num_abave_threshold_false = len(df2.index)-num_above_threshold_ture
 df3 = df1[df1['pvalues']<m]
 num_below_threshold_ture = len(df3[df3['Hugo_Symbol'].isin(df1_true_num)].index)
 num_total = len(df1.index)-len(df2.index)-num_below_threshold_ture
 o,p = fisher_ex(num_above_threshold_ture,num_abave_threshold_false,num_below_threshold_ture,num_total)
-print('DF-CAGE的富集p：{}'.format(p))
-print('DF-CAGE的富集odds ratio：{}'.format(o))
-
-
 
 fpr, tpr, thresholds = roc_curve(yy, probas_)
 roc_auc_2 = auc(fpr, tpr)
-#print('DF-CAGE方法的pvalue: {}'.format(-math.log10(pvalue)))
-print('DF-CAGE方法的pvalue: {}'.format(pvalue))
-print('DF-CAGE方法的roc_auc_2: {}'.format(roc_auc_2))
 precision, recall, thresholds = precision_recall_curve(yy, probas_)
 AP = average_precision_score(yy, probas_)
-print("DF-CAGE方法的AUPRC (area = %0.4f)" % AP)
+print("DF-CAGE OF AUPRC (area = %0.4f)" % AP)
 
 file_name = ['OncodriveCLUST','OncodriveFML','MutSig2CV','MuSiC','e-Driver']
 for i in file_name:
@@ -284,7 +262,7 @@ for i in file_name:
 df = pd.read_csv(r'./input/target_set.csv',sep=',')
 l0 = df['Hugo_Symbol'].values.tolist()
 print(len(l0))
-df1 = pd.read_csv(r'D:\PycharmProjects\补充实验\DriverML.csv',sep=',')
+df1 = pd.read_csv(r'D:\PycharmProjects\DriverML.csv',sep=',')
 
 df1 = df1[df1['gene'].isin(l0)]
 df1.rename(columns={'gene':'Hugo_Symbol'},inplace=True)
@@ -296,13 +274,13 @@ list_y = df_new['class'].values
 #AUROC
 fpr, tpr, thresholds = roc_curve(list_y, list_x)
 roc_auc = auc(fpr, tpr)
-print('DriverML的AUROC: {}'.format(roc_auc))
+print('DriverML Of AUROC: {}'.format(roc_auc))
 plt.plot(fpr, tpr, label='DriverML (AUC=%0.4f)' % roc_auc)
 
 #AUPRC
 precision, recall, thresholds = precision_recall_curve(list_y, list_x)
 AP = average_precision_score(list_y, list_x)
-print("DriverML的AUPRC (area = %0.4f)" % AP)
+print("DriverML of AUPRC (area = %0.4f)" % AP)
 #plt.plot(recall, precision, label='DriverML (AUPRC=%0.2f)' % AP)
 
 plt.legend()
