@@ -175,7 +175,6 @@ def fit_cv(X,y, k,a,b,c,d, b_plot=False, method='RF'):
     plt.plot(fpr, tpr, label='(DF-CAGE=%0.4f)' % mean_auc,)
     return m
 
-#其他方法得auroc
 def gui(path,m):
     df = pd.read_csv(r'.\model\{}\{}/PANCAN.txt'.format(path,path),sep='\t')
     if path == '2020plus':
@@ -195,9 +194,8 @@ def gui(path,m):
     df.to_csv(r'.\model\{}\{}/PANCAN_1.csv'.format(path, path), index=False, sep=',')
 
 
-    #//////////////////////////////归一化
-    df_guiyi = pd.read_csv(r'.\model\{}\{}/PANCAN_1.csv'.format(path,path),sep=',')
-    #进行从大到小排序，然后把重复项去除，保留数值大的
+    #Normalized
+    df_guiyi = pd.read_csv(r'.\model\{}\{}/PANCAN_1.csv'.format(path,path),sep=','
     df_guiyi.sort_values(by='pvalue', ascending=False,inplace=True)
     df_guiyi = df_guiyi.drop_duplicates(subset=['gene'], keep='first')
     df_guiyi['pvalue']= df_guiyi[['pvalue']].apply(lambda x:(x-np.min(x))/(np.max(x)-np.min(x)))
@@ -222,7 +220,7 @@ def gui(path,m):
     fpr, tpr, thresholds = roc_curve(list_y, list_x)
     roc_auc = auc(fpr, tpr)
 
-    #enrichment analysis
+    #Enrichment analysis
     df_new_num = df_new[df_new['class'] == 1]['Hugo_Symbol'].tolist()
     df_new1 = df_new[df_new['pvalue'] > m]
     num_a = len(df_new1[df_new1['Hugo_Symbol'].isin(df_new_num)].index)
@@ -232,8 +230,6 @@ def gui(path,m):
     num_d = len(df_new.index) - len(df_new1.index) - num_c
     p = fisher_ex(num_a, num_b, num_c, num_d)
     print('{}_enrichment_pvalue：{}'.format(path, p))
-    ###
-
     print('{}_pvalue:'.format(path),pvalue)
     print('{}:'.format(path),roc_auc)
     #AP = average_precision_score(list_y, list_x)
