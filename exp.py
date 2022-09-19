@@ -14,7 +14,6 @@ import random
 import torch
 from sklearn.utils import shuffle
 
-#设置随机种子
 seed = 6
 torch.manual_seed(seed)
 random.seed(seed)
@@ -22,8 +21,8 @@ np.random.seed(seed)
 # tf.random.set_seed(seed)
 os.environ['PYTHONHASHSEED'] = str(seed)
 
-#oncoKB和target的并集,作为可用药的正样本
-df = pd.read_csv(r'.\input\new_set_zhen.csv',sep=',')#target的可用药基因
+#The union of oncoKB and target, as a positive sample for drug use
+df = pd.read_csv(r'.\input\new_set_zhen.csv',sep=',')
 ll = df['Hugo_Symbol'].values.tolist()
 df1 = pd.read_csv(r'.\input\zhen.csv',sep=',')
 ll1 = df1['Hugo_Symbol'].values.tolist()
@@ -33,11 +32,10 @@ print(len(df['Hugo_Symbol'].tolist()))
 
 df = pd.concat([df,df1],axis=0)
 df = shuffle(df)
-df.to_csv(r'.\results\zong_zhenfu.csv',index=False,)#,oncoKB和target的并集
+df.to_csv(r'.\results\zong_zhenfu.csv',index=False,)
 
 df_3 = pd.read_csv(r'.\input\ffu.csv',sep=',')
 df_3['class'] = 0
-#将TTN、CACNA1E、COL11A1、DST基因从ffu中排除，这类基因不太可能促进癌症的发生，将其放在负样本中
 l_7= ['TTN','CACNA1E','COL11A1','DST']
 df_7 = df_3[df_3['Hugo_Symbol'].isin(l_7)]
 df_3= df_3[~df_3['Hugo_Symbol'].isin(l_7)]
