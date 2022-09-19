@@ -14,7 +14,7 @@ import os
 import random
 import torch
 from sklearn.utils import shuffle
-#设置随机种子
+
 seed = 1
 torch.manual_seed(seed)
 random.seed(seed)
@@ -23,9 +23,9 @@ np.random.seed(seed)
 os.environ['PYTHONHASHSEED'] = str(seed)
 
 
-#drugbank的集子
+#drugbank set
 df = pd.read_csv(r'D:\PycharmProjects\7/gene_list.csv',sep=',')
-lis = df['gene'].values.tolist()  #drugbank可用药基因
+lis = df['gene'].values.tolist()  #drugbank
 df1 = pd.read_csv(r'D:\PycharmProjects\CIFAR10\hs_2.csv',sep=',')
 df1 =df1[df1['Hugo_Symbol'].isin(lis)]
 df1['class'] = 1
@@ -42,33 +42,21 @@ df = pd.concat([df1,df_3],axis=0)
 df = shuffle(df)
 df.to_csv(r'D:\PycharmProjects\7/drugbank_zhenfu.csv',index=False)#,正负样本集
 
-#数据提取
+#Data Extraction
 def gaibian (t):
-    #可用药的正样本的基因
-    df = pd.read_csv(r'D:\PycharmProjects\cna/zhen.csv',sep=',')
+    #Positive sample genes
+    df = pd.read_csv(r'./input/positive.csv',sep=',')
     l_zhen = df['Hugo_Symbol'].values.tolist()
 
-    #可疑，负样本的基因
-    df_1 = pd.read_csv(r'D:\PycharmProjects\cna/fu.csv',sep=',')
-    l_fu = df['Hugo_Symbol'].values.tolist()
-
-    df_2 = pd.read_csv(r'D:\PycharmProjects\hm/ffu.csv',sep=',')
+    df_2 = pd.read_csv(r'./input/negative.csv',sep=',')
     df_2['class'] = 0
-    #将TTN、CACNA1E、COL11A1、DST基因从ffu中排除，这类基因不太可能促进癌症的发生，将其放在负样本中
     l_7= ['TTN','CACNA1E','COL11A1','DST']
     df_7 = df_2[df_2['Hugo_Symbol'].isin(l_7)]
     df_2= df_2[~df_2['Hugo_Symbol'].isin(l_7)]
     df_3 = df_2.sample(n=len(df.index)*t-4,random_state=1,replace = False)
     df = pd.concat([df,df_3],axis=0)  #df为x
     df = pd.concat([df,df_7],axis=0)
-    df.to_csv(r'D:\PycharmProjects\hm/zf_ban.csv',index=False,sep=',')
-
-    df_4 = df_2.sample(n=len(df_1.index)*t,random_state=1,replace = False)
-    df_1 = pd.concat([df_1,df_4],axis=0)
-    df_1['class'] = -1
-    df_1.to_csv(r'D:\PycharmProjects\hm/zf_ban_semi.csv',index=False,sep=',')#df_1为semi
-
-
+    df.to_csv(r'D:\PycharmProjects\hm/zf_ban.csv',index=False,sep=','
 
 
 df = pd.read_csv(r'D:\PycharmProjects\cna/zonghe_zhenfu.csv',sep=',')
@@ -79,7 +67,7 @@ x_semi = df.drop(['biaoqian','Hugo_Symbol','class'], axis = 1).values
 
 
 
-#找roc的最优阈值
+#Roc optimal threshold
 def Find_Optimal_Cutoff(TPR, FPR, threshold):
     y = TPR - FPR
     Youden_index = np.argmax(y)  # Only the first occurrence is returned.
@@ -96,8 +84,8 @@ def fisher_ex(a, b, c, d):
     #     p1 = 0
     return p1
 
-#半监督的交叉验证
-def fit_cv(X, X_semi, y, k, b_plot=False, method='RF'):
+#Cross-validation
+def fit_cv(X, y, k, b_plot=False, method='RF'):
     n = X.shape[0]
     assignments = np.array((n // k + 1) * list(range(1, k + 1)))
     assignments = assignments[:n]
@@ -108,7 +96,6 @@ def fit_cv(X, X_semi, y, k, b_plot=False, method='RF'):
         ix = assignments == i
         y_test = y[ix]
         y_train = y[~ix]
-        y_semi = np.ones((X_semi.shape[0])) * -1
         X_train = X[~ix, :]
         X_test = X[ix, :]
         # scaler = RobustScaler()
@@ -136,9 +123,7 @@ def fit_cv(X, X_semi, y, k, b_plot=False, method='RF'):
             probas_ = model.predict_proba(X_test)[:, 1]
             fpr, tpr, thresholds = roc_curve(y_test, probas_)
             roc_auc_1 = auc(fpr, tpr)
-            print('准确率：{}'.format(roc_auc_1))
             optimal_th, optimal_point = Find_Optimal_Cutoff(TPR=tpr, FPR=fpr, threshold=thresholds)
-            print('门限：{}'.format(optimal_th))
             if roc_auc_1 > z:
                 z = roc_auc_1
                 m = optimal_th
@@ -164,7 +149,6 @@ def fit_cv(X, X_semi, y, k, b_plot=False, method='RF'):
     # plt.plot(fpr, tpr, label='(our=%0.4f)' % mean_auc)
     return m
 
-#其他方法得auroc
 def gui(path,m):
     df = pd.read_csv(r'D:\PycharmProjects\Fashion_MNIST\{}\{}/PANCAN.txt'.format(path,path),sep='\t')
     #if path!= '2020plus':
