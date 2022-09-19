@@ -98,13 +98,6 @@ def fit_cv(X, y, k, b_plot=False, method='RF'):
         y_train = y[~ix]
         X_train = X[~ix, :]
         X_test = X[ix, :]
-        # scaler = RobustScaler()
-        # X_train = scaler.fit_transform(X_train)
-        # X_test = scaler.transform(X_test)
-
-
-
-        # sys.exit()
 
         if method == 'SVM':
             model = SelfTrainingClassifier(SVC(gamma='auto', probability=True))
@@ -167,7 +160,7 @@ def gui(path,m):
     df.to_csv(r'D:\PycharmProjects\Fashion_MNIST\{}\{}/PANCAN_1.csv'.format(path, path), index=False, sep=',')
 
 
-    #//////////////////////////////归一化
+    #Normalized
     df_guiyi = pd.read_csv(r'D:\PycharmProjects\Fashion_MNIST\{}\{}/PANCAN_1.csv'.format(path,path),sep=',')
     df_guiyi['pvalue']= df_guiyi[['pvalue']].apply(lambda x:(x-np.min(x))/(np.max(x)-np.min(x)))
     #list_1 = df_guiyi['gene'].values.tolist()
@@ -182,20 +175,20 @@ def gui(path,m):
     df_new['pvalue'] = df_new['pvalue'].fillna(0)
     df_new.to_csv(r'D:\PycharmProjects\Fashion_MNIST\{}\{}/PANCAN_3.csv'.format(path, path), index=False, sep=',')
 
-    #Mann-Whitney U test显著性差异校验
+    #Mann-Whitney U test significant difference check
     list_x = df_new['pvalue'].values
     list_y = df_new['class'].values
     x3_all = list_x[list_y == 0]
     x4_all = list_x[list_y == 1]
     statistic, pvalue = stats.mannwhitneyu(x4_all, x3_all, use_continuity=True, alternative='two-sided')
 
-    #ROC指标
+    #ROC indicator
     fpr, tpr, thresholds = roc_curve(list_y, list_x)
     roc_auc = auc(fpr, tpr)
     print('{}_pvalue:'.format(path), -math.log10(pvalue))
     print('{}:'.format(path),roc_auc)
 
-    # 富集分析
+    # Enrichment analysis
     df_new_num = df_new[df_new['class'] == 1]['Hugo_Symbol'].tolist()
     df_new1 = df_new[df_new['pvalue'] > m]
     num_a = len(df_new1[df_new1['Hugo_Symbol'].isin(df_new_num)].index)
@@ -204,7 +197,6 @@ def gui(path,m):
     num_c = len(df_num2[df_num2['Hugo_Symbol'].isin(df_new_num)].index)
     num_d = len(df_new.index) - len(df_new1.index) - num_c
     p = fisher_ex(num_a, num_b, num_c, num_d)
-    print('{}富集p：{}'.format(path, p))
     #AP = average_precision_score(list_y, list_x)
     #plt.plot(recall, precision, label='{}(AP=%0.2f)'.format(path) % AP)
     plt.plot(fpr, tpr, label='{}(AUC=%0.4f)'.format(path) % roc_auc)
@@ -220,19 +212,22 @@ def t(k,t):
     return m
 m = t(1,5)
 
-#加载最优模型对TARGET数据集预测
+#Load the optimal model to predict the TARGET dataset
 model = joblib.load('./model.pkl')
-#读入DrugbankB数据集
-df = pd.read_csv(r'D:\PycharmProjects\7/drugbank_zhenfu.csv',sep=',')#正负样本比例是1：10
+              
+#Read in Drugbankb dataset
+df = pd.read_csv(r'D:\PycharmProjects\7/drugbank_zhenfu.csv',sep=',')
 l1 = df[df['class']==1]['Hugo_Symbol'].values.tolist()
 print(len(l1))
 name = df['Hugo_Symbol'].values.tolist()
 yy = df['class'].values
 xx = df.drop(['biaoqian','Hugo_Symbol','class'], axis = 1).values
-#对数据归一化
+              
+#database normalization
 # scaler =RobustScaler()
 # xx = scaler.fit_transform(xx)
-#预测
+              
+#predict
 probas_ = model.predict_proba(xx)[:, 1]
 dict_from_list = dict(zip(name,probas_))
 new = pd.DataFrame(list(dict_from_list.items()))
@@ -243,7 +238,7 @@ new.sort_values(by='score', ascending=False, inplace=True )
 new = new[new['score']>=0.04]
 new.to_csv(r'D:\PycharmProjects\7/new.csv',index=False)
 
-#筛选预测集
+#Filter prediction sets
 # l2 = new['Hugo_Symbol'].values.tolist()
 l2 = ['JAK1', 'MAPK1', 'JAK2', 'ERBB2', 'FGFR1', 'ALK', 'MAP2K1', 'FGFR3', 'EPHA2', 'KIT', 'PDGFRA', 'ESR1', 'RET', 'CDK4', 'RAF1', 'FGFR2', 'RXRA', 'ERBB4', 'EGFR', 'MET', 'NTRK1', 'BRAF', 'AR', 'PDGFRB', 'ABL1', 'TLR4', 'KDR', 'FLT3', 'CDK6', 'MAP2K2', 'DDR2', 'MMP16', 'TOP1', 'HDAC9', 'MAPT', 'PARP1', 'HDAC1', 'FLT4', 'ATIC', 'MAP2', 'TUBB', 'FLT1', 'TUBA4A', 'TUBA1A', 'MAP4', 'PSMB1', 'TUBG1', 'ESR2', 'TOP2A', 'GART', 'TEK', 'RXRG', 'BTK', 'DPYD', 'SSTR2', 'SSTR1', 'MMP2', 'TUBB1', 'CSF1R', 'PSMB5', 'FCGR2A', 'NR1I2', 'LHCGR', 'VEGFA', 'CD274', 'MMP3', 'CD22', 'ADRA2C', 'RXRB', 'MMP21', 'CSF3R', 'GGPS1', 'FCGR3A', 'TUBD1', 'MMP28', 'FGFR4', 'PDCD1', 'CD80', 'ABAT', 'FRK', 'CD19', 'CD3E', 'CYP11A1', 'DHFR', 'FCGR1A', 'FCGR3B', 'GNRHR', 'MAPK11', 'MRC1', 'NOD2', 'PARP2', 'PARP3', 'PGF', 'RARG', 'RRM1', 'SSTR5', 'TYMP', 'VEGFB']
 df1 = pd.read_csv(r'D:\PycharmProjects\CIFAR10\hs_2.csv',sep=',')
@@ -259,7 +254,6 @@ df = pd.concat([df1,df_3],axis=0)
 df = shuffle(df)
 df.to_csv(r'D:\PycharmProjects\7/new_zhenfu.csv',index=False)#,正负样本集
 
-#预测
 y1 = df['class'].values
 xx = df.drop(['biaoqian','Hugo_Symbol','class'], axis = 1).values
 probas_1 = model.predict_proba(xx)[:, 1]
@@ -271,9 +265,8 @@ for i in probas_1[y1 == 0]:
 for i in probas_1[y1 == 1]:
     x2_all.append(i)
 statistic, pvalue = stats.mannwhitneyu(x1_all, x2_all, use_continuity=True, alternative='two-sided')
-print('DF-CAGE 显著醒检验pvalues ：{}'.format(-math.log10(pvalue)))
 
-#富集分析
+#Enrichment analysis
 probas_array = np.array(probas_1)
 probas_df = pd.DataFrame(probas_array)
 probas_df.columns = ['pvalues']
@@ -287,7 +280,6 @@ df3 = df1[df1['pvalues']<m]
 num_below_threshold_ture = len(df3[df3['Hugo_Symbol'].isin(df1_true_num)].index)
 num_total = len(df1.index)-len(df2.index)-num_below_threshold_ture
 p = fisher_ex(num_above_threshold_ture,num_abave_threshold_false,num_below_threshold_ture,num_total)
-print('DF-CAGE富集p：{}'.format(p))
 
 # print(probas_)
 fpr, tpr, thresholds = roc_curve(y1, probas_1)
